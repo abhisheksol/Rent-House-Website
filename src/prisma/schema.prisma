@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id         Int        @id @default(autoincrement())
+  name       String
+  email      String     @unique
+  password   String
+  role       String     @default("tenant") // Provide a default value
+  created_at DateTime   @default(now())
+  properties Property[]
+  bookings   Booking[]
+  comments   Comment[]
+}
+
+// model for rent house posts
+model Property {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  address     String
+  rent_price  Float
+  room        String    @default("1HK")
+  city        String    @default("Pune")
+  landlord_id Int
+  landlord    user      @relation(fields: [landlord_id], references: [id])
+  created_at  DateTime  @default(now())
+  images      Image[] // New relationship to store property images
+  comments    Comment[]
+  bookings    Booking[]
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  property_id Int
+  tenant_id   Int
+  start_date  DateTime
+  end_date    DateTime
+  status      String // pending, approved, rejected
+  created_at  DateTime @default(now())
+  property    Property @relation(fields: [property_id], references: [id])
+  tenant      user     @relation(fields: [tenant_id], references: [id])
+}
+
+// model for room 
+model Image {
+  id          Int      @id @default(autoincrement())
+  url         String // URL of the image
+  property_id Int
+  property    Property @relation(fields: [property_id], references: [id])
+}
+
+// model comment
+model Comment {
+  id          Int      @id @default(autoincrement())
+  text        String
+  email       String   @default("Anonymous")
+  user_id     Int
+  property_id Int
+  created_at  DateTime @default(now())
+  user        user     @relation(fields: [user_id], references: [id])
+  property    Property @relation(fields: [property_id], references: [id])
+}
