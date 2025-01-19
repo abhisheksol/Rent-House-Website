@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllProperty = exports.addproperty = void 0;
+exports.getPropertyById = exports.getAllProperty = exports.addproperty = void 0;
 const dbconfig_1 = __importDefault(require("../Config/dbconfig"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // post all property controller
@@ -89,4 +89,29 @@ const getAllProperty = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getAllProperty = getAllProperty;
+// get property by id controller
+// get property by id controller
+const getPropertyById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { tenant_id } = req.body; // Assuming you send tenant_id in the request
+    try {
+        const property = yield dbconfig_1.default.property.findUnique({
+            where: {
+                id: parseInt(id)
+            },
+            include: {
+                images: true,
+                bookings: true, // Include the bookings
+                comments: true
+            }
+        });
+        // Check if the tenant has already booked the property
+        const isBooked = property === null || property === void 0 ? void 0 : property.bookings.some(booking => booking.tenant_id === tenant_id);
+        res.status(200).json({ property, isBooked }); // Send the booking status
+    }
+    catch (error) {
+        res.status(500).json({ message: error });
+    }
+});
+exports.getPropertyById = getPropertyById;
 //# sourceMappingURL=propertyController.js.map

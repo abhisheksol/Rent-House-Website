@@ -25,13 +25,14 @@ exports.getComments = exports.addComment = void 0;
 const dbconfig_1 = __importDefault(require("../Config/dbconfig"));
 // add comment
 const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { text, user_id, property_id } = req.body;
+    const { text, user_id, property_id, email } = req.body;
     try {
         const comment = yield dbconfig_1.default.comment.create({
             data: {
                 text,
                 user_id,
-                property_id
+                property_id,
+                email
             }
         });
         res.status(201).json(comment);

@@ -93,7 +93,10 @@ export const getAllProperty = async (req: Request, res: Response) => {
 // get property by id controller
 export const getPropertyById = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { tenant_id } = req.body; // Assuming you send tenant_id in the request
+    const tenant_id = req.query.tenant_id;
+
+
+
     try {
         const property = await prisma.property.findUnique({
             where: {
@@ -106,10 +109,17 @@ export const getPropertyById = async (req: Request, res: Response) => {
             }
         });
 
+        // Safely convert tenant_id to a number for comparison
+        const tenantIdNumber = tenant_id ? parseInt(tenant_id as string, 10) : null;
+
         // Check if the tenant has already booked the property
-        const isBooked = property?.bookings.some(booking => booking.tenant_id === tenant_id);
-        
-        res.status(200).json({ property, isBooked });  // Send the booking status
+        const isBooked = tenantIdNumber
+            ? property?.bookings.some(booking => booking.tenant_id === tenantIdNumber)
+            : false;
+        console.log(isBooked, {});
+
+
+        res.status(200).json({ property , isBooked});  // Send the booking status
 
     } catch (error) {
         res.status(500).json({ message: error });

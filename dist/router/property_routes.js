@@ -7,5 +7,6 @@ const router = (0, express_1.Router)();
 // const token = req.cookies.token || req.headers.authorization?.split(" ")[1];; // Retrieve the "token" cookie
 router.get("/", Authenication_1.protectRoute, propertyController_1.getAllProperty);
 router.post("/add_post", propertyController_1.addproperty);
+router.get("/:id", propertyController_1.getPropertyById);
 exports.default = router;
 //# sourceMappingURL=property_routes.js.map
